@@ -13,6 +13,11 @@ class Player
     this.gravity = createVector(0, this.maxSpeed / 10);
     this.angle = radians(0);
 
+    //microphone control
+    this.mic = new p5.AudioIn();
+    this.mic.start();
+    this.triggerLevel = 30;
+
     this.color = color(255, 242, 0);
 
   }
@@ -22,8 +27,6 @@ class Player
     push();
     stroke(0);
     fill(this.color);
-    // rectMode(CENTER)
-    // rect(this.position.x, this.position.y, this.w, this.w);
     translate(this.position.x, this.position.y);
     rotate(this.angle);
     beginShape(TRIANGLES);
@@ -32,6 +35,17 @@ class Player
     vertex(-this.w, -this.w);
     endShape(CLOSE);
     pop();
+
+  }
+
+  drawMicLevel()
+  {
+    //draw mic level
+    fill(0);
+    noStroke()
+    rect(width - 50, height - this.getMicLevel(), 50, this.getMicLevel());
+    stroke(255, 0, 0);
+    line(width - 50, height - this.triggerLevel, width, height - this.triggerLevel)
   }
 
   update()
@@ -48,13 +62,23 @@ class Player
     }
   }
 
+  getMicLevel()
+  {
+    return constrain(this.mic.getLevel() * 1000, 0, 100);
+  }
+
+  micTriggered()
+  {
+    return (this.getMicLevel() > this.triggerLevel);
+  }
+
   move()
   {
-    if (keyIsPressed || mouseIsPressed)
+    if (keyIsPressed || mouseIsPressed || this.micTriggered())
     {
       if (this.canJump)
       {
-        if (keyCode == 32 || mouseIsPressed)
+        if (keyCode == 32 || mouseIsPressed || this.micTriggered())
         {
           this.started = true;
           this.canJump = false;

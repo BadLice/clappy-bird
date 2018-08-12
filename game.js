@@ -5,11 +5,12 @@ class Game
     createCanvas(800, 800);
     this.player = new Player();
     this.obs = [];
-    // this.obs.push(new Obstacle());
     this.cycles = 0;
     this.obstacleRate = 150;
     this.score = 0;
 
+    this.triggerSlider = createSlider(1, 100, 30);
+    this.triggerSlider.position(10, height - 20);
   }
 
   reset()
@@ -25,15 +26,12 @@ class Game
   {
     background(0, 237, 255);
 
-
     this.player.draw();
     for (var o of this.obs)
     {
       o.draw();
     }
     fill(255);
-
-
 
     if (this.player.dead)
     {
@@ -44,17 +42,23 @@ class Game
       textSize(36);
       textFont('Helvetica');
       text(this.score, width / 2, height / 2 - height / 4);
+      if (!this.player.started)
+      {
+        text("Space, mouse or clap your hands to jump", width / 2 - 345, height / 2 - height / 4 + 35);
+      }
     }
+    this.player.drawMicLevel();
   }
 
   drawScore()
   {
     text("YOUR SCORE: " + this.score, width / 2 - 120, height / 2 - 50);
-    text("Press a key to restart ", width / 2 - 150, height / 2 - 50 + 35);
+    text("Press a key or clap your hands to restart ", width / 2 - 300, height / 2 - 50 + 35);
   }
 
   update()
   {
+    this.updateTriggerLevel();
     if (!this.player.dead)
     {
       this.player.update();
@@ -73,7 +77,7 @@ class Game
     }
     else
     {
-      if (keyIsPressed || mouseIsPressed)
+      if (keyIsPressed || mouseIsPressed || this.player.micTriggered())
         this.reset();
     }
   }
@@ -91,6 +95,11 @@ class Game
         }
       }
     }
+  }
+
+  updateTriggerLevel()
+  {
+    this.player.triggerLevel = this.triggerSlider.value();
   }
 
   manageObstacles()
